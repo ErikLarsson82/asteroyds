@@ -51,7 +51,7 @@ requirejs([
 
   game.init(playSound)
 
-  var FPS = 1000/60;
+  var FPS = 1000/144;
 
   setInterval(function() {
     if (!running) return;

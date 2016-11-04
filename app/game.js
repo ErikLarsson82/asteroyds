@@ -27,6 +27,7 @@ define('app/game', [
   const DEBUG_DRAW_SAFE_ZONE = false;
 
   let gameOver = false;
+  let fadeInText = 0;
 
   let playSound
 
@@ -282,6 +283,28 @@ define('app/game', [
     console.error(`None of type ${type}, ${gameObject} - ${other}`)
   }
 
+  function particleExplosion(pos, amount) {
+    _.each(new Array(amount), function() {
+      var particleSettings = {
+        pos: {
+          x: pos.x,
+          y: pos.y,
+        },
+        velocity: {
+          x: (Math.random() - 0.5) * 4,
+          y: (Math.random() - 0.5) * 4
+        },
+        direction: 0,
+        rotation: 0,
+        radius: 0,
+        image: images.particle,
+        lifetime: 30
+      }
+      var particle = new Particle(particleSettings);
+      gameObjects.push(particle);    
+    });
+  }
+
   function resolveCollision(gameObject, other) {
     if (isOfTypes(gameObject, other, PlayerShip, AsteroydBig)) {
       gameObject.destroy();
@@ -321,6 +344,7 @@ define('app/game', [
 
       shot.destroy();
       asteroydBig.destroy();
+      particleExplosion(asteroydBig.pos, 10);
     }
 
     if (isOfTypes(gameObject, other, Shot, AsteroydMedium)) {
@@ -349,11 +373,15 @@ define('app/game', [
       shot.destroy();
       asteroydMedium.destroy();
       playSound('hit')
+      particleExplosion(asteroydMedium.pos, 10);
     }
 
     if (isOfTypes(gameObject, other, Shot, AsteroydSmall)) {
       gameObject.destroy();
       other.destroy();
+
+      var asteroydSmall = getOfType(gameObject, other, AsteroydSmall)
+      particleExplosion(asteroydSmall.pos, 10);
     }
   }
 
@@ -465,6 +493,8 @@ define('app/game', [
 
       
       if (gameOver) {
+        if (fadeInText < 1) fadeInText += 0.01;
+        renderingContext.globalAlpha = fadeInText;
         if (playerAlive()) {
           renderingContext.drawImage(images.victory,
             Math.round(canvasWidth/2 - images.victory.width/2),
@@ -476,6 +506,7 @@ define('app/game', [
             Math.round(canvasHeight/2 - images.gameover.height/2)
           );
         }
+        renderingContext.globalAlpha = 1;
       }
     },
   }
