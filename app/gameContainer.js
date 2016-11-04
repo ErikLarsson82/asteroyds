@@ -51,9 +51,11 @@ requirejs([
 
   game.init(playSound)
 
+  var FPS = 1000/60;
+
   setInterval(function() {
     if (!running) return;
-    game.tick(1000/60);
+    game.tick(FPS);
     game.draw(renderingContext);
-  }, 1000/60);
+  }, FPS);
 })
