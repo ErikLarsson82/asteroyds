@@ -158,21 +158,21 @@ define('app/game', [
       super.tick();
     }
     createParticles() {
-      if (Math.random() > 0.3) {
+      if (Math.random() > 0.7) {
         var particleSettings = {
           pos: {
             x: this.pos.x + -Math.sin(this.direction) * 26,
             y: this.pos.y + Math.cos(this.direction) * 26,
           },
           velocity: {
-            x: -Math.sin(this.direction) * 4 + (Math.random() - 0.5),
-            y: Math.cos(this.direction) * 4 + (Math.random() - 0.5)
+            x: -Math.sin(this.direction) * 4 + (Math.random() - 0.5) * 2,
+            y: Math.cos(this.direction) * 4 + (Math.random() - 0.5) * 2
           },
           direction: Math.floor(Math.random() * 360),
           rotation: Math.random() * 0.05,
           radius: 2,
           image: images.particle,
-          lifetime: 100
+          lifetime: 40
         }
         var particle = new Particle(particleSettings);
         gameObjects.push(particle);
