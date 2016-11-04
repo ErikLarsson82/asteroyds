@@ -160,14 +160,17 @@ define('app/game', [
       if (pad.buttons[15].pressed) { // right
         this.direction += 0.03;
       }
-      if (pad.buttons[2].pressed || pad.buttons[5].pressed) { // z or space
+
+      // z, space, LB, L1
+      if (pad.buttons[2].pressed || pad.buttons[5].pressed) {
         this.fire();
       }
       var acceleration = {
         x: 0,
         y: 0
       }
-      if (pad.buttons[0].pressed || pad.buttons[4].pressed) { // up or X
+      // up or X
+      if (pad.buttons[12].pressed || pad.buttons[0].pressed || pad.buttons[4].pressed) {
         if (isGasljudetPlaying === false) {
           playSound('gasljudet')
           isGasljudetPlaying = true
