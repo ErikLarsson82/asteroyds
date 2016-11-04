@@ -232,8 +232,68 @@ define('app/game', [
       gameObject.destroy();
       other.destroy();
     }
+    if (isOfTypes(gameObject, other, PlayerShip, AsteroydMedium)) {
+      gameObject.destroy();
+      other.destroy();
+    }
+    if (isOfTypes(gameObject, other, PlayerShip, AsteroydSmall)) {
+      gameObject.destroy();
+      other.destroy();
+    }
 
     if (isOfTypes(gameObject, other, Shot, AsteroydBig)) {
+      var shot = getOfType(gameObject, other, Shot)
+      var asteroydBig = getOfType(gameObject, other, AsteroydBig)
+
+      _.each(new Array(3), function() {
+        var asteroydSettings = {
+          pos: {
+            x: asteroydBig.pos.x,
+            y: asteroydBig.pos.y,
+          },
+          velocity: {
+            x: (Math.random() - 0.5) * 2,
+            y: (Math.random() - 0.5) * 2
+          },
+          direction: Math.floor(Math.random() * 360),
+          radius: 40,
+          image: images.asteroydMedium
+        }
+        var asteroydMedium = new AsteroydMedium(asteroydSettings);
+        gameObjects.push(asteroydMedium);
+      });
+
+      shot.destroy();
+      asteroydBig.destroy();
+    }
+
+    if (isOfTypes(gameObject, other, Shot, AsteroydMedium)) {
+      var shot = getOfType(gameObject, other, Shot)
+      var asteroydMedium = getOfType(gameObject, other, AsteroydMedium)
+
+      _.each(new Array(2), function() {
+        var asteroydSettings = {
+          pos: {
+            x: asteroydMedium.pos.x,
+            y: asteroydMedium.pos.y,
+          },
+          velocity: {
+            x: (Math.random() - 0.5) * 4,
+            y: (Math.random() - 0.5) * 4
+          },
+          direction: Math.floor(Math.random() * 360),
+          radius: 20,
+          image: images.asteroydSmall
+        }
+        var asteroydSmall = new AsteroydSmall(asteroydSettings);
+        gameObjects.push(asteroydSmall);
+      });
+
+      shot.destroy();
+      asteroydMedium.destroy();
+    }
+
+    if (isOfTypes(gameObject, other, Shot, AsteroydSmall)) {
       gameObject.destroy();
       other.destroy();
     }
@@ -251,7 +311,9 @@ define('app/game', [
 
   function endConditions() {
     var amountStroyds = _.filter(gameObjects, function(item) {
-        return item instanceof AsteroydBig;
+        return item instanceof AsteroydBig ||
+               item instanceof AsteroydMedium ||
+               item instanceof AsteroydSmall;
       }).length;
     if (amountStroyds === 0) gameOver = true;
 
@@ -278,7 +340,7 @@ define('app/game', [
       })
       gameObjects.push(playerShip)
 
-      _.each(new Array(1), function() {
+      _.each(new Array(6), function() {
         var pos = {
           x: Math.random() * canvasWidth,
           y: Math.random() * canvasHeight

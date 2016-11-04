@@ -17,8 +17,8 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   return {
     ship: ship,
     playerbullet: playerbullet,
-    asteroydBig: asteroydBig
-    asteroydMedium: asteroydMedium
+    asteroydBig: asteroydBig,
+    asteroydMedium: asteroydMedium,
     asteroydSmall: asteroydSmall
   }
 })
