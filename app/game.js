@@ -33,7 +33,9 @@ define('app/game', [
         y: 0,
       }
       this.velocity = config.velocity;
+      this.direction = config.direction;
       this.radius = config.radius;
+      this.image = config.image;
     }
     tick() {
       //Wrap logic
@@ -51,6 +53,8 @@ define('app/game', [
       }
     }
     draw(renderingContext) {
+      this.drawImage(renderingContext);
+
       if (DEBUG_DRAW_CIRCLES) {
         renderingContext.beginPath();
         renderingContext.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI, false);
@@ -58,6 +62,13 @@ define('app/game', [
         renderingContext.strokeStyle = "white";
         renderingContext.stroke();
       }
+    }
+    drawImage(renderingContext) {
+      renderingContext.save();
+      renderingContext.translate(this.pos.x, this.pos.y);
+      renderingContext.rotate(this.direction);
+      renderingContext.drawImage(this.image, 0 - this.image.width/2, 0 - this.image.height/2);
+      renderingContext.restore();
     }
     remove() {
       this.markedForRemoval = true;
@@ -67,15 +78,18 @@ define('app/game', [
   class PlayerShip extends GameObject {
     constructor(config) {
       super(config)
-      this.velocity = {
-        x: 0,
-        y: 0
-      }
-      this.direction = config.direction;
       this.recharged = true
       this.rechargeTimer = 0;
     }
+    handleRecharge() {
+      this.rechargeTimer--;
+      if (this.rechargeTimer <= 0) {
+        this.recharged = true;
+      }
+    }
     tick() {
+      this.handleRecharge();
+
       const pad = userInput.getInput(0)
       if (pad.buttons[14].pressed) { // left
         this.direction -= 0.03;
@@ -83,9 +97,8 @@ define('app/game', [
       if (pad.buttons[15].pressed) { // right
         this.direction += 0.03;
       }
-      this.rechargeTimer--;
-      if (this.rechargeTimer <= 0) {
-        this.recharged = true;
+      if (pad.buttons[0].pressed) { // z or space
+        this.fire();
       }
       var acceleration = {
         x: 0,
@@ -110,16 +123,37 @@ define('app/game', [
       super.tick();
     }
     fire() {
+      if (!this.recharged) return;
+
       this.recharged = false;
-      this.rechargeTimer = 30;
+      this.rechargeTimer = 40;
+      
+      var shotConfig = {
+        pos: {
+          x: this.pos.x + Math.sin(this.direction) * 26,
+          y: this.pos.y + -Math.cos(this.direction) * 26
+        },
+        velocity: {
+          x: Math.sin(this.direction) * 3,
+          y: -Math.cos(this.direction) * 3
+        },
+        direction: this.direction,
+        image: images.playerbullet
+      }
+      var shot = new Shot(shotConfig);
+      gameObjects.push(shot);
     }
-    draw(renderingContext) {
-      renderingContext.save();
-      renderingContext.translate(this.pos.x, this.pos.y);
-      renderingContext.rotate(this.direction);
-      renderingContext.drawImage(images.ship, 0 - images.ship.width/2, 0 - images.ship.height/2);
-      renderingContext.restore();
-      super.draw(renderingContext);
+  }
+
+  class Shot extends GameObject {
+    tick() {
+      const nextPosition = {
+        x: this.pos.x + this.velocity.x,
+        y: this.pos.y + this.velocity.y
+      }
+      this.pos = nextPosition;
+
+      super.tick();
     }
   }
 
@@ -162,8 +196,13 @@ define('app/game', [
           x: canvasWidth / 2,
           y: canvasHeight / 2
         },
+        velocity: {
+          x: 0,
+          y: 0
+        },
         direction: 0,
-        radius: 16
+        radius: 16,
+        image: images.ship
       })
       gameObjects.push(playerShip)
 
@@ -179,7 +218,8 @@ define('app/game', [
             y: Math.random() - 0.5
           },
           direction: Math.floor(Math.random() * 360),
-          radius: (Math.random() * 25) + 25
+          radius: (Math.random() * 25) + 25,
+          image: images.asteroydBig
         }))
 
       })
