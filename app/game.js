@@ -118,6 +118,22 @@ define('app/game', [
     }
   }
 
+  class DeathParticle extends GameObject {
+    constructor(config) {
+      super(config);
+    }
+    tick() {
+      const nextPosition = {
+        x: this.pos.x + this.velocity.x,
+        y: this.pos.y + this.velocity.y
+      }
+      this.pos = nextPosition;
+    }
+    draw(renderingContext) {
+      super.draw(renderingContext);
+    }
+  }
+
   class PlayerShip extends GameObject {
     constructor(config) {
       super(config)
@@ -284,7 +300,7 @@ define('app/game', [
     console.error(`None of type ${type}, ${gameObject} - ${other}`)
   }
 
-  function particleExplosion(pos, amount) {
+  function asteroidParticleExplosion(pos, amount) {
     _.each(new Array(amount), function() {
       var particleSettings = {
         pos: {
@@ -306,18 +322,75 @@ define('app/game', [
     });
   }
 
+  function explodePlayer(pos) {
+    var directions = [
+      {
+        x: 0,
+        y: -1,
+      },
+      {
+        x: 0.5,
+        y: -0.5,
+      },
+      {
+        x: 1,
+        y: 0,
+      },
+      {
+        x: 0.5,
+        y: 0.5,
+      },
+      {
+        x: 0,
+        y: 1,
+      },
+      {
+        x: -0.5,
+        y: 0.5,
+      },
+      {
+        x: -1,
+        y: 0,
+      },
+      {
+        x: -0.5,
+        y: -0.5
+      }
+    ];
+
+    _.each(directions, function(dir) {
+
+    var particleSettings = {
+        pos: pos,
+        velocity: {
+          x: dir.x,
+          y: dir.y
+        },
+        direction: 0,
+        rotation: 0,
+        radius: 0,
+        image: images.deathparticle
+      }
+      var particle = new DeathParticle(particleSettings);
+      gameObjects.push(particle);
+    })
+  }
+
   function resolveCollision(gameObject, other) {
     if (isOfTypes(gameObject, other, PlayerShip, AsteroydBig)) {
-      gameObject.destroy();
-      other.destroy();
+      var player = getOfType(gameObject, other, PlayerShip)
+      player.destroy();
+      explodePlayer(playerShip.pos);
     }
     if (isOfTypes(gameObject, other, PlayerShip, AsteroydMedium)) {
-      gameObject.destroy();
-      other.destroy();
+      var player = getOfType(gameObject, other, PlayerShip)
+      player.destroy();
+      explodePlayer(playerShip.pos);
     }
     if (isOfTypes(gameObject, other, PlayerShip, AsteroydSmall)) {
-      gameObject.destroy();
-      other.destroy();
+      var player = getOfType(gameObject, other, PlayerShip)
+      player.destroy();
+      explodePlayer(playerShip.pos);
     }
 
     if (isOfTypes(gameObject, other, Shot, AsteroydBig)) {
@@ -345,7 +418,7 @@ define('app/game', [
 
       shot.destroy();
       asteroydBig.destroy();
-      particleExplosion(asteroydBig.pos, 10);
+      asteroidParticleExplosion(asteroydBig.pos, 10);
     }
 
     if (isOfTypes(gameObject, other, Shot, AsteroydMedium)) {
@@ -374,7 +447,7 @@ define('app/game', [
       shot.destroy();
       asteroydMedium.destroy();
       playSound('hit')
-      particleExplosion(asteroydMedium.pos, 10);
+      asteroidParticleExplosion(asteroydMedium.pos, 10);
     }
 
     if (isOfTypes(gameObject, other, Shot, AsteroydSmall)) {
@@ -382,7 +455,7 @@ define('app/game', [
       other.destroy();
 
       var asteroydSmall = getOfType(gameObject, other, AsteroydSmall)
-      particleExplosion(asteroydSmall.pos, 10);
+      asteroidParticleExplosion(asteroydSmall.pos, 10);
     }
   }
 
@@ -470,14 +543,14 @@ define('app/game', [
       if (gameOver) {
         //Only tick some stuff!
         _.each(gameObjects, function (gameObject) {
-          if (gameObject instanceof Particle) gameObject.tick();
+          if (gameObject instanceof DeathParticle ||
+            gameObject instanceof Particle) gameObject.tick();
         })
-        return;
+      } else {
+        _.each(gameObjects, function (gameObject) {
+          gameObject.tick();
+        })
       }
-
-      _.each(gameObjects, function (gameObject) {
-        gameObject.tick();
-      })
 
       gameObjects = gameObjects.filter(function (gameObject) {
         return !gameObject.markedForRemoval
