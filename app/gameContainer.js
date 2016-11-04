@@ -13,18 +13,18 @@ requirejs([
   let running = true
   let muted = false
 
-  /*const musicAudio = new Audio('music.ogg')
+  const musicAudio = new Audio('assets/sounds/Asteroids001.ogg')
   musicAudio.addEventListener('ended', function() {
       this.currentTime = 0;
       this.play();
   }, false);
-  musicAudio.play();
-
+  
   const sfxs = {
-    shot: new Audio('Shot001.ogg'),
-    enemyShot: new Audio('Shot003.ogg'),
-    enemyHit: new Audio('Shot002.ogg'),
-  }*/
+    gameMusic: musicAudio,
+    shot: new Audio('assets/sounds/Asteroidsshot001.ogg'),
+    die: new Audio('assets/sounds/Asteroidsdie001.ogg'),
+    hit: new Audio('assets/sounds/Asteroidhit001.ogg'),
+  }
   
   window.addEventListener('keydown', function (e) {
     if (e.keyCode === 80) { // P - pause
@@ -33,23 +33,23 @@ requirejs([
       muted = !muted
     }
 
-    /*if (muted) {
+    if (muted) {
       musicAudio.pause()
     } else {
       musicAudio.play()
-    }*/
+    }
   })
 
-  /*function playSound(soundString) {
+  function playSound(soundString) {
     if (!muted) {
       sfxs[soundString].play()
     }
-  }*/
+  }
 
   const canvas = document.getElementById('canvas')
   const renderingContext = canvas.getContext('2d')
 
-  game.init()
+  game.init(playSound)
 
   setInterval(function() {
     if (!running) return;

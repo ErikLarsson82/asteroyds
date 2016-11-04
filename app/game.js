@@ -28,7 +28,7 @@ define('app/game', [
 
   let gameOver = false;
 
-  //let playSound
+  let playSound
 
   let gameObjects = []
   let playerShip
@@ -83,6 +83,13 @@ define('app/game', [
     }
     destroy() {
       this.markedForRemoval = true;
+      if (this instanceof AsteroydBig ||
+          this instanceof AsteroydMedium ||
+          this instanceof AsteroydSmall) {
+        playSound('hit')
+      } else if (this instanceof PlayerShip) {
+        playSound('die')
+      }
     }
   }
 
@@ -199,6 +206,7 @@ define('app/game', [
       }
       var shot = new Shot(shotConfig);
       gameObjects.push(shot);
+      playSound('shot')
     }
   }
 
@@ -340,6 +348,7 @@ define('app/game', [
 
       shot.destroy();
       asteroydMedium.destroy();
+      playSound('hit')
     }
 
     if (isOfTypes(gameObject, other, Shot, AsteroydSmall)) {
@@ -379,7 +388,9 @@ define('app/game', [
   }
 
   return {
-    init: function() {
+    init: function(_playSound) {
+      playSound = _playSound
+      playSound('gameMusic')
       playerShip = new PlayerShip({
         pos: {
           x: canvasWidth / 2,
