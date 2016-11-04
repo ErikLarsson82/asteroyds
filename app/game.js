@@ -23,7 +23,7 @@ define('app/game', [
 
   const DEBUG_WRITE_BUTTONS = false
   const DEBUG_DISABLE_GRAPHICS = false;
-  const DEBUG_DRAW_CIRCLES = true;
+  const DEBUG_DRAW_CIRCLES = false;
   const DEBUG_DRAW_SAFE_ZONE = false;
 
   let gameOver = false;
@@ -42,6 +42,7 @@ define('app/game', [
       }
       this.velocity = config.velocity;
       this.direction = config.direction;
+      this.rotation = config.rotation || 0;
       this.radius = config.radius;
       this.image = config.image;
     }
@@ -59,6 +60,7 @@ define('app/game', [
       if (this.pos.y < 0 - this.radius) {
         this.pos.y = canvasHeight + this.radius;
       }
+      this.direction = this.direction + this.rotation;
       handleMove(this);
     }
     draw(renderingContext) {
@@ -256,7 +258,8 @@ define('app/game', [
             y: (Math.random() - 0.5) * 2
           },
           direction: Math.floor(Math.random() * 360),
-          radius: 40,
+          rotation: Math.random() * 0.05,
+          radius: 36,
           image: images.asteroydMedium
         }
         var asteroydMedium = new AsteroydMedium(asteroydSettings);
@@ -271,7 +274,7 @@ define('app/game', [
       var shot = getOfType(gameObject, other, Shot)
       var asteroydMedium = getOfType(gameObject, other, AsteroydMedium)
 
-      _.each(new Array(2), function() {
+      _.each(new Array(3), function() {
         var asteroydSettings = {
           pos: {
             x: asteroydMedium.pos.x,
@@ -282,7 +285,8 @@ define('app/game', [
             y: (Math.random() - 0.5) * 4
           },
           direction: Math.floor(Math.random() * 360),
-          radius: 20,
+          rotation: Math.random() * 0.05,
+          radius: 16,
           image: images.asteroydSmall
         }
         var asteroydSmall = new AsteroydSmall(asteroydSettings);
@@ -302,7 +306,9 @@ define('app/game', [
   function handleMove(gameObject) {
     _.each(gameObjects, function(item) {
       if (gameObject !== item) {
-        if (utils.distance(gameObject, item) < 0) {
+        if (utils.distance(gameObject, item) < 0 &&
+          !gameObject.markedForRemoval &&
+          !item.markedForRemoval) {
           resolveCollision(gameObject, item)
         }
       }
@@ -361,6 +367,7 @@ define('app/game', [
             y: Math.random() - 0.5
           },
           direction: Math.floor(Math.random() * 360),
+          rotation: Math.random() * 0.005,
           radius: 65,
           image: images.asteroydBig
         }))
