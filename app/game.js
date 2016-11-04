@@ -358,12 +358,12 @@ define('app/game', [
             y: asteroydMedium.pos.y,
           },
           velocity: {
-            x: (Math.random() - 0.5) * 4,
-            y: (Math.random() - 0.5) * 4
+            x: (Math.random() - 0.5) * 3,
+            y: (Math.random() - 0.5) * 3
           },
           direction: Math.floor(Math.random() * 360),
           rotation: Math.random() * 0.05,
-          radius: 16,
+          radius: 20,
           image: images.asteroydSmall
         }
         var asteroydSmall = new AsteroydSmall(asteroydSettings);
