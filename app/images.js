@@ -6,7 +6,7 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   playerbullet.src = "./assets/images/playerbullet.png";
 
   var asteroydBig = new Image();
-  asteroydBig.src = "./assets/images/asteroydBig.png";
+  asteroydBig.src = "./assets/images/asteroidbig1.png";
 
   return {
     ship: ship,

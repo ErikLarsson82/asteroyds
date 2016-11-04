@@ -16,7 +16,7 @@ define('app/game', [
 
   const DEBUG_WRITE_BUTTONS = false
   const DEBUG_DISABLE_GRAPHICS = false;
-  const DEBUG_DRAW_CIRCLES = true;
+  const DEBUG_DRAW_CIRCLES = !true;
 
   let gameOver = false;
 
