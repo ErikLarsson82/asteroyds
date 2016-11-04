@@ -57,17 +57,12 @@ requirejs([
       //try {
         game.tick()
         game.draw(renderingContext)
-      } catch (e) {
+      /*} catch (e) {
         console.error(e)
         running = false
-      }
+      }*/
     }
   }
-  gameLoop()
 
-  /*setInterval(function() {
-    if (!running) return;
-    game.tick()
-    game.draw(renderingContext)
-  }, 1000/60)*/
+  gameLoop()
 })
