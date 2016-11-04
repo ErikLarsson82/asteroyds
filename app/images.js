@@ -14,11 +14,19 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   var asteroydSmall = new Image();
   asteroydSmall.src = "./assets/images/asteroidsmall1.png";
 
+  var victory = new Image();
+  victory.src = "./assets/images/VICTORY.png";
+
+  var particle = new Image();
+  particle.src = "./assets/images/particle.png";
+
   return {
     ship: ship,
     playerbullet: playerbullet,
     asteroydBig: asteroydBig,
     asteroydMedium: asteroydMedium,
-    asteroydSmall: asteroydSmall
+    asteroydSmall: asteroydSmall,
+    victory: victory,
+    particle: particle
   }
 })
