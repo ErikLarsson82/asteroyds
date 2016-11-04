@@ -86,6 +86,29 @@ define('app/game', [
     }
   }
 
+  class Particle extends GameObject {
+    constructor(config) {
+      super(config);
+      this.lifetimeMax = config.lifetime;
+      this.lifetime = config.lifetime;
+    }
+    tick() {
+      const nextPosition = {
+        x: this.pos.x + this.velocity.x,
+        y: this.pos.y + this.velocity.y
+      }
+      this.pos = nextPosition;
+
+      this.lifetime--;
+      if (this.lifetime <= 0) this.markedForRemoval = true;
+    }
+    draw(renderingContext) {
+      renderingContext.globalAlpha = (this.lifetime / this.lifetimeMax);
+      super.draw(renderingContext);
+      renderingContext.globalAlpha = 1;
+    }
+  }
+
   class PlayerShip extends GameObject {
     constructor(config) {
       super(config)
@@ -116,6 +139,7 @@ define('app/game', [
         y: 0
       }
       if (pad.buttons[12].pressed) {
+        this.createParticles();
         acceleration = {
           x: Math.sin(this.direction) / 100,
           y: -Math.cos(this.direction) / 100
@@ -132,6 +156,27 @@ define('app/game', [
       this.pos = nextPosition;
 
       super.tick();
+    }
+    createParticles() {
+      if (Math.random() > 0.3) {
+        var particleSettings = {
+          pos: {
+            x: this.pos.x + -Math.sin(this.direction) * 26,
+            y: this.pos.y + Math.cos(this.direction) * 26,
+          },
+          velocity: {
+            x: -Math.sin(this.direction) * 4 + (Math.random() - 0.5),
+            y: Math.cos(this.direction) * 4 + (Math.random() - 0.5)
+          },
+          direction: Math.floor(Math.random() * 360),
+          rotation: Math.random() * 0.05,
+          radius: 2,
+          image: images.particle,
+          lifetime: 100
+        }
+        var particle = new Particle(particleSettings);
+        gameObjects.push(particle);
+      }
     }
     fire() {
       if (!this.recharged) return;
