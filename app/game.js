@@ -508,7 +508,7 @@ define('app/game', [
       })
       gameObjects.push(playerShip)
 
-      _.each(new Array(1), function() {
+      _.each(new Array(6), function() {
         var pos = {
           x: Math.random() * canvasWidth,
           y: Math.random() * canvasHeight
