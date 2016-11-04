@@ -21,7 +21,7 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   gameover.src = "./assets/images/gameover.png";
 
   var particle = new Image();
-  particle.src = "./assets/images/particle.png";
+  particle.src = "./assets/images/motorparticle.png";
 
   return {
     ship: ship,

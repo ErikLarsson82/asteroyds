@@ -31,12 +31,11 @@ requirejs([
       running = !running
     } else if (e.keyCode === 77) { // M - mute
       muted = !muted
-    }
-
-    if (muted) {
-      musicAudio.pause()
-    } else {
-      musicAudio.play()
+      if (muted) {
+        musicAudio.pause()
+      } else {
+        musicAudio.play()
+      }
     }
   })
 

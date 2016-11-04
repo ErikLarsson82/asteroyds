@@ -166,21 +166,21 @@ define('app/game', [
       super.tick();
     }
     createParticles() {
-      if (Math.random() > 0.7) {
+      if (Math.random() > 0.2) {
         var particleSettings = {
           pos: {
             x: this.pos.x + -Math.sin(this.direction) * 26,
             y: this.pos.y + Math.cos(this.direction) * 26,
           },
           velocity: {
-            x: -Math.sin(this.direction) * 4 + (Math.random() - 0.5) * 2,
-            y: Math.cos(this.direction) * 4 + (Math.random() - 0.5) * 2
+            x: -Math.sin(this.direction) + (Math.random() - 0.5) * 2,
+            y: Math.cos(this.direction) + (Math.random() - 0.5) * 2,
           },
-          direction: Math.floor(Math.random() * 360),
-          rotation: Math.random() * 0.05,
+          direction: this.direction + Math.PI,
+          rotation: 0,
           radius: 2,
           image: images.particle,
-          lifetime: 40
+          lifetime: 10
         }
         var particle = new Particle(particleSettings);
         gameObjects.push(particle);
@@ -418,7 +418,7 @@ define('app/game', [
   return {
     init: function(_playSound) {
       playSound = _playSound
-      playSound('gameMusic')
+      // playSound('gameMusic')
       playerShip = new PlayerShip({
         pos: {
           x: canvasWidth / 2,
