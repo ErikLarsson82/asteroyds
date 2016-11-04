@@ -174,6 +174,15 @@ define('app/game', [
         (gameObject instanceof type2 && other instanceof type1)
   }
 
+  function getOfType(gameObject, other, type) {
+    if (gameObject instanceof type) {
+      return gameObject
+    } else if (other instanceof type) {
+      return other
+    }
+    console.error(`None of type ${type}, ${gameObject} - ${other}`)
+  }
+
   function endConditions() {
     /*_.chain(gameObjects)
         .filter(function(item) {
