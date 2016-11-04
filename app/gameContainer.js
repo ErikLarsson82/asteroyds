@@ -51,18 +51,9 @@ requirejs([
 
   game.init()
 
-  function gameLoop() {
-    window.requestAnimationFrame(gameLoop)
-    if (running) {
-      //try {
-        game.tick()
-        game.draw(renderingContext)
-      /*} catch (e) {
-        console.error(e)
-        running = false
-      }*/
-    }
-  }
-
-  gameLoop()
+  setInterval(function() {
+    if (!running) return;
+    game.tick(1000/60);
+    game.draw(renderingContext);
+  }, 1000/60);
 })
