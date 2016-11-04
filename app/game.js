@@ -418,7 +418,7 @@ define('app/game', [
   return {
     init: function(_playSound) {
       playSound = _playSound
-      // playSound('gameMusic')
+      playSound('gameMusic')
       playerShip = new PlayerShip({
         pos: {
           x: canvasWidth / 2,
