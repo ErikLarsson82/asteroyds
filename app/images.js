@@ -8,9 +8,17 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   var asteroydBig = new Image();
   asteroydBig.src = "./assets/images/asteroidbig1.png";
 
+  var asteroydMedium = new Image();
+  asteroydMedium.src = "./assets/images/asteroidmedium1.png";
+  
+  var asteroydSmall = new Image();
+  asteroydSmall.src = "./assets/images/asteroidsmall1.png";
+
   return {
     ship: ship,
     playerbullet: playerbullet,
     asteroydBig: asteroydBig
+    asteroydMedium: asteroydMedium
+    asteroydSmall: asteroydSmall
   }
 })

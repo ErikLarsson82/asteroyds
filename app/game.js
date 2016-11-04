@@ -14,9 +14,17 @@ define('app/game', [
   const canvasWidth = 1024
   const canvasHeight = 768
 
+  const safeZone = {
+    x: canvasWidth/2-300,
+    y: canvasHeight/2-300,
+    width: 600,
+    height: 600
+  }
+
   const DEBUG_WRITE_BUTTONS = false
   const DEBUG_DISABLE_GRAPHICS = false;
-  const DEBUG_DRAW_CIRCLES = !true;
+  const DEBUG_DRAW_CIRCLES = true;
+  const DEBUG_DRAW_SAFE_ZONE = false;
 
   let gameOver = false;
 
@@ -28,7 +36,7 @@ define('app/game', [
   class GameObject {
     constructor(config) {
       this.markedForRemoval = false;
-      this.pos = config.pos || {
+      this.pos = config.pos || { 
         x: 0,
         y: 0,
       }
@@ -51,6 +59,7 @@ define('app/game', [
       if (this.pos.y < 0 - this.radius) {
         this.pos.y = canvasHeight + this.radius;
       }
+      handleMove(this);
     }
     draw(renderingContext) {
       this.drawImage(renderingContext);
@@ -70,7 +79,7 @@ define('app/game', [
       renderingContext.drawImage(this.image, 0 - this.image.width/2, 0 - this.image.height/2);
       renderingContext.restore();
     }
-    remove() {
+    destroy() {
       this.markedForRemoval = true;
     }
   }
@@ -137,6 +146,7 @@ define('app/game', [
           x: Math.sin(this.direction) * 3,
           y: -Math.cos(this.direction) * 3
         },
+        radius: 6,
         direction: this.direction,
         image: images.playerbullet
       }
@@ -146,7 +156,14 @@ define('app/game', [
   }
 
   class Shot extends GameObject {
+    constructor(config) {
+      super(config);
+      this.duration = 180;
+    }
     tick() {
+      this.duration--;
+      if (this.duration < 0) this.markedForRemoval = true;
+
       const nextPosition = {
         x: this.pos.x + this.velocity.x,
         y: this.pos.y + this.velocity.y
@@ -158,6 +175,30 @@ define('app/game', [
   }
 
   class AsteroydBig extends GameObject {
+    tick() {
+      const nextPosition = {
+        x: this.pos.x + this.velocity.x,
+        y: this.pos.y + this.velocity.y
+      }
+      this.pos = nextPosition;
+
+      super.tick();
+    }
+  }
+
+  class AsteroydMedium extends GameObject {
+    tick() {
+      const nextPosition = {
+        x: this.pos.x + this.velocity.x,
+        y: this.pos.y + this.velocity.y
+      }
+      this.pos = nextPosition;
+
+      super.tick();
+    }
+  }
+
+  class AsteroydSmall extends GameObject {
     tick() {
       const nextPosition = {
         x: this.pos.x + this.velocity.x,
@@ -186,19 +227,38 @@ define('app/game', [
     console.error(`None of type ${type}, ${gameObject} - ${other}`)
   }
 
-  function endConditions() {
-    /*_.chain(gameObjects)
-        .filter(function(item) {
-          return item instanceof Enemy;
-        })
-        .each(function(item) {
-          if (item.hitbox.y > 620) gameOver = true;
-        });
+  function resolveCollision(gameObject, other) {
+    if (isOfTypes(gameObject, other, PlayerShip, AsteroydBig)) {
+      gameObject.destroy();
+      other.destroy();
+    }
 
-    var enemies = _.filter(gameObjects, function(item) {
-      return item instanceof Enemy || item instanceof EnemyExplosion;
-    });
-    if (enemies.length === 0) gameOver = true;*/
+    if (isOfTypes(gameObject, other, Shot, AsteroydBig)) {
+      gameObject.destroy();
+      other.destroy();
+    }
+  }
+
+  function handleMove(gameObject) {
+    _.each(gameObjects, function(item) {
+      if (gameObject !== item) {
+        if (utils.distance(gameObject, item) < 0) {
+          resolveCollision(gameObject, item)
+        }
+      }
+    })
+  }
+
+  function endConditions() {
+    var amountStroyds = _.filter(gameObjects, function(item) {
+        return item instanceof AsteroydBig;
+      }).length;
+    if (amountStroyds === 0) gameOver = true;
+
+    var playerDead = _.filter(gameObjects, function(item) {
+        return item instanceof PlayerShip;
+      }).length;
+    if (playerDead === 0) gameOver = true;
   }
 
   return {
@@ -218,19 +278,28 @@ define('app/game', [
       })
       gameObjects.push(playerShip)
 
-      _.each(new Array(6), function() {
-
-        gameObjects.push(new AsteroydBig({
-          pos: {
+      _.each(new Array(1), function() {
+        var pos = {
+          x: Math.random() * canvasWidth,
+          y: Math.random() * canvasHeight
+        };
+        while(pos.x > safeZone.x &&
+              pos.x < safeZone.x + safeZone.width &&
+              pos.y > safeZone.y &&
+              pos.y < safeZone.y + safeZone.height) {
+          pos = {
             x: Math.random() * canvasWidth,
             y: Math.random() * canvasHeight
-          },
+          }
+        }
+        gameObjects.push(new AsteroydBig({
+          pos: pos,
           velocity: {
             x: Math.random() - 0.5,
             y: Math.random() - 0.5
           },
           direction: Math.floor(Math.random() * 360),
-          radius: (Math.random() * 25) + 25,
+          radius: 65,
           image: images.asteroydBig
         }))
 
@@ -256,10 +325,16 @@ define('app/game', [
       renderingContext.fillStyle = "#01020B"
       renderingContext.fillRect(0,0,canvasWidth, canvasHeight)
 
+      if (DEBUG_DRAW_SAFE_ZONE) {
+        renderingContext.fillStyle = "red"
+        renderingContext.fillRect(safeZone.x, safeZone.y, safeZone.width, safeZone.height)
+      }
+
       _.each(gameObjects, function (gameObject) {
         gameObject.draw(renderingContext)
       })
 
+      
       if (gameOver) {
         renderingContext.font= "30px Verdana";
         renderingContext.fillStyle="white";
