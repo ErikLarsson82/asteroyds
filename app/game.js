@@ -184,7 +184,7 @@ define('app/game', [
 
       // z, space, LB, L1
       if (pad.buttons[2].pressed || pad.buttons[5].pressed) {
-        this.fire();
+        if (countStroids() > 0) this.fire();
       }
       var acceleration = {
         x: 0,
@@ -538,13 +538,16 @@ define('app/game', [
     return (playerDead !== 0);
   }
 
-  function endConditions() {
-    var amountStroyds = _.filter(gameObjects, function(item) {
+  function countStroids() {
+    return _.filter(gameObjects, function(item) {
         return item instanceof AsteroydBig ||
                item instanceof AsteroydMedium ||
                item instanceof AsteroydSmall;
       }).length;
-    if (amountStroyds === 0) {
+  }
+
+  function endConditions() {
+    if (countStroids() === 0) {
       stars();
       gameOver = true;
     }
