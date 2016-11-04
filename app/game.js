@@ -253,7 +253,7 @@ define('app/game', [
       })
     },
     draw: function (renderingContext) {
-      renderingContext.fillStyle = "black"
+      renderingContext.fillStyle = "#01020B"
       renderingContext.fillRect(0,0,canvasWidth, canvasHeight)
 
       _.each(gameObjects, function (gameObject) {
