@@ -11,29 +11,24 @@ define('app/game', [
   SpriteSheet,
   images
 ) {
-  const canvasWidth = 1024
-  const canvasHeight = 768
+  let canvasWidth
+  let canvasHeight
 
-  const safeZone = {
-    x: canvasWidth/2-300,
-    y: canvasHeight/2-300,
-    width: 600,
-    height: 600
-  }
+  let safeZone
 
   const DEBUG_WRITE_BUTTONS = false;
   const DEBUG_DISABLE_GRAPHICS = false;
   const DEBUG_DRAW_CIRCLES = false;
   const DEBUG_DRAW_SAFE_ZONE = false;
 
-  let gameOver = false;
-  let fadeInText = 0;
-  let isVictoryMusicPlaying = false
-  let isGasljudetPlaying = false
+  let gameOver
+  let fadeInText
+  let isVictoryMusicPlaying
+  let isGasljudetPlaying
 
   let playSound
 
-  let gameObjects = []
+  let gameObjects
   let playerShip
 
   function debugWriteButtons(pad) {
@@ -165,14 +160,14 @@ define('app/game', [
       if (pad.buttons[15].pressed) { // right
         this.direction += 0.03;
       }
-      if (pad.buttons[2].pressed) { // z or space
+      if (pad.buttons[2].pressed || pad.buttons[5].pressed) { // z or space
         this.fire();
       }
       var acceleration = {
         x: 0,
         y: 0
       }
-      if (pad.buttons[0].pressed) { // up or X
+      if (pad.buttons[0].pressed || pad.buttons[4].pressed) { // up or X
         if (isGasljudetPlaying === false) {
           playSound('gasljudet')
           isGasljudetPlaying = true
@@ -509,6 +504,23 @@ define('app/game', [
 
   return {
     init: function(_playSound) {
+      canvasWidth = 1024
+      canvasHeight = 768
+
+      safeZone = {
+        x: canvasWidth/2-300,
+        y: canvasHeight/2-300,
+        width: 600,
+        height: 600
+      }
+
+      gameOver = false
+      fadeInText = 0
+      isVictoryMusicPlaying = false
+      isGasljudetPlaying = false
+      
+      gameObjects = []
+      
       playSound = _playSound
       playSound('gameMusic')
       playerShip = new PlayerShip({
@@ -614,5 +626,10 @@ define('app/game', [
         renderingContext.globalAlpha = 1;
       }
     },
+    destroy: function() {
+      playSound('victoryMusic', true)
+      playSound('gasljudet', true)
+
+    }
   }
 })

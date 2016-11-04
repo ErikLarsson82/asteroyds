@@ -8,7 +8,8 @@ requirejs.config({
 
 requirejs([
   'app/game',
-], function (game) {
+  'userInput',
+], function (game, userInput) {
 
   let running = true
   let muted = false
@@ -50,6 +51,9 @@ requirejs([
       } else {
         gameMusic.play()
       }
+    } else if (e.keyCode === 82) { // R - restart
+      game.destroy();
+      game.init(playSound);
     }
   })
 
@@ -72,6 +76,11 @@ requirejs([
 
   setInterval(function() {
     if (!running) return;
+    const pad = userInput.getInput(0);
+    if (pad.buttons[9].pressed) {
+      game.destroy();
+      game.init(playSound);
+    }
     game.tick(FPS);
     game.draw(renderingContext);
   }, FPS);
