@@ -13,14 +13,21 @@ requirejs([
   let running = true
   let muted = false
 
-  const musicAudio = new Audio('assets/sounds/Asteroids001.ogg')
-  musicAudio.addEventListener('ended', function() {
+  const gameMusic = new Audio('assets/sounds/Asteroids001.ogg')
+  gameMusic.addEventListener('ended', function() {
+      this.currentTime = 0;
+      this.play();
+  }, false);
+
+  const victoryMusic = new Audio('assets/sounds/Asteriodsvictory.ogg')
+  victoryMusic.addEventListener('ended', function() {
       this.currentTime = 0;
       this.play();
   }, false);
   
   const sfxs = {
-    gameMusic: musicAudio,
+    gameMusic: gameMusic,
+    victoryMusic: victoryMusic,
     shot: new Audio('assets/sounds/Asteroidsshot001.ogg'),
     die: new Audio('assets/sounds/Asteroidsdie001.ogg'),
     hit: new Audio('assets/sounds/Asteroidhit001.ogg'),
@@ -32,16 +39,20 @@ requirejs([
     } else if (e.keyCode === 77) { // M - mute
       muted = !muted
       if (muted) {
-        musicAudio.pause()
+        gameMusic.pause()
       } else {
-        musicAudio.play()
+        gameMusic.play()
       }
     }
   })
 
-  function playSound(soundString) {
+  function playSound(soundString, shouldPause) {
     if (!muted) {
-      sfxs[soundString].play()
+      if (shouldPause) {
+        sfxs[soundString].pause()
+      } else {
+        sfxs[soundString].play()
+      }
     }
   }
 

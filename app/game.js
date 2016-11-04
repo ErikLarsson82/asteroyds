@@ -28,6 +28,7 @@ define('app/game', [
 
   let gameOver = false;
   let fadeInText = 0;
+  let isVictoryMusicPlaying = false
 
   let playSound
 
@@ -434,7 +435,7 @@ define('app/game', [
       })
       gameObjects.push(playerShip)
 
-      _.each(new Array(6), function() {
+      _.each(new Array(1), function() {
         var pos = {
           x: Math.random() * canvasWidth,
           y: Math.random() * canvasHeight
@@ -500,6 +501,11 @@ define('app/game', [
         if (fadeInText < 1) fadeInText += 0.01;
         renderingContext.globalAlpha = fadeInText;
         if (playerAlive()) {
+          if (isVictoryMusicPlaying === false) {
+            playSound('gameMusic', true)
+            playSound('victoryMusic')
+            isVictoryMusicPlaying = true
+          }
           renderingContext.drawImage(images.victory,
             Math.round(canvasWidth/2 - images.victory.width/2),
             Math.round(canvasHeight/2 - images.victory.height/2)
