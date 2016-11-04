@@ -21,7 +21,7 @@ define('app/game', [
     height: 600
   }
 
-  const DEBUG_WRITE_BUTTONS = false
+  const DEBUG_WRITE_BUTTONS = false;
   const DEBUG_DISABLE_GRAPHICS = false;
   const DEBUG_DRAW_CIRCLES = false;
   const DEBUG_DRAW_SAFE_ZONE = false;
@@ -34,6 +34,13 @@ define('app/game', [
 
   let gameObjects = []
   let playerShip
+
+  function debugWriteButtons(pad) {
+        if (!DEBUG_WRITE_BUTTONS) return;
+        _.each(pad && pad.buttons, function(button, idx) {
+            if (button.pressed) console.log(idx + " pressed");
+        })
+    }
 
   class GameObject {
     constructor(config) {
@@ -150,20 +157,21 @@ define('app/game', [
       this.handleRecharge();
 
       const pad = userInput.getInput(0)
+      debugWriteButtons(pad);
       if (pad.buttons[14].pressed) { // left
         this.direction -= 0.03;
       }
       if (pad.buttons[15].pressed) { // right
         this.direction += 0.03;
       }
-      if (pad.buttons[0].pressed) { // z or space
+      if (pad.buttons[2].pressed) { // z or space
         this.fire();
       }
       var acceleration = {
         x: 0,
         y: 0
       }
-      if (pad.buttons[12].pressed) {
+      if (pad.buttons[0].pressed) { // up or X
         this.createParticles();
         acceleration = {
           x: Math.sin(this.direction) / 100,
