@@ -559,6 +559,10 @@ define('app/game', [
       endConditions();
 
       if (gameOver) {
+        if (isGasljudetPlaying === true) {
+          playSound('gasljudet', true)
+          isGasljudetPlaying === false
+        }
         //Only tick some stuff!
         _.each(gameObjects, function (gameObject) {
           if (gameObject instanceof DeathParticle ||
