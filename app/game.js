@@ -456,13 +456,13 @@ define('app/game', [
       if (gameOver) {
         if (playerAlive()) {
           renderingContext.drawImage(images.victory,
-            canvasWidth/2 - images.victory.width/2,
-            canvasHeight/2 - images.victory.height/2
+            Math.round(canvasWidth/2 - images.victory.width/2),
+            Math.round(canvasHeight/2 - images.victory.height/2)
           );
         } else {
-          renderingContext.drawImage(images.asteroydBig,
-            canvasWidth/2 - images.asteroydBig.width/2,
-            canvasHeight/2 - images.asteroydBig.height/2
+          renderingContext.drawImage(images.gameover,
+            Math.round(canvasWidth/2 - images.gameover.width/2),
+            Math.round(canvasHeight/2 - images.gameover.height/2)
           );
         }
       }

@@ -17,6 +17,9 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   var victory = new Image();
   victory.src = "./assets/images/VICTORY.png";
 
+  var gameover = new Image();
+  gameover.src = "./assets/images/gameover.png";
+
   var particle = new Image();
   particle.src = "./assets/images/particle.png";
 
@@ -27,6 +30,7 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
     asteroydMedium: asteroydMedium,
     asteroydSmall: asteroydSmall,
     victory: victory,
-    particle: particle
+    particle: particle,
+    gameover: gameover
   }
 })
