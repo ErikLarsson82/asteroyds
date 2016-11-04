@@ -565,27 +565,34 @@ define('app/game', [
           gameObject instanceof Particle)
         gameObject.draw(renderingContext)
     })
-    if (fadeInText < 1) fadeInText += 0.01;
-    renderingContext.globalAlpha = fadeInText;
+    
     if (playerAlive()) {
       if (isVictoryMusicPlaying === false) {
         playSound('gameMusic', true)
         playSound('victoryMusic')
         isVictoryMusicPlaying = true
       }
+
+      if (fadeInText < 1) fadeInText += 0.01;
+      renderingContext.globalAlpha = fadeInText;
       renderingContext.drawImage(images.victory,
         Math.round(canvasWidth/2 - images.victory.width/2),
         Math.round(canvasHeight/2 - images.victory.height/2)
       );
-
+      renderingContext.globalAlpha = 1;
     } else {
+      renderingContext.drawImage(images.starry, 0,0);
+      _.each(gameObjects, function (gameObject) {
+        gameObject.draw(renderingContext);
+      })
+      if (fadeInText < 1) fadeInText += 0.01;
+      renderingContext.globalAlpha = fadeInText;
       renderingContext.drawImage(images.gameover,
         Math.round(canvasWidth/2 - images.gameover.width/2),
         Math.round(canvasHeight/2 - images.gameover.height/2)
       );
-
+      renderingContext.globalAlpha = 1;
     }
-    renderingContext.globalAlpha = 1;
   }
 
   function tickGameOver() {
@@ -594,11 +601,13 @@ define('app/game', [
       isGasljudetPlaying === false
     }
 
-    playerShip.pos = {
-      x: 500,
-      y: 200
+    if (playerAlive()) {
+      playerShip.pos = {
+        x: 500,
+        y: 200
+      }
+      playerShip.createParticles();
     }
-    playerShip.createParticles();
 
     //Only tick some stuff!
     _.each(gameObjects, function (gameObject) {
@@ -699,12 +708,12 @@ define('app/game', [
       if (gameOver) {
         drawGameOver(renderingContext);
       } else {
-          renderingContext.drawImage(images.starry, 0,0)
+        renderingContext.drawImage(images.starry, 0,0)
           
-          _.each(gameObjects, function (gameObject) {
-            gameObject.draw(renderingContext)
-          })
-        }
+        _.each(gameObjects, function (gameObject) {
+          gameObject.draw(renderingContext)
+        })
+      }
     },
     destroy: function() {
       playSound('victoryMusic', true)
