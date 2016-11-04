@@ -175,6 +175,9 @@ define('app/game', [
   }
 
   function getOfType(gameObject, other, type) {
+    if (gameObject instanceof type && other instanceof type) {
+      console.warn(`Both ${gameObject} and ${other} were of type ${type}`)
+    }
     if (gameObject instanceof type) {
       return gameObject
     } else if (other instanceof type) {
