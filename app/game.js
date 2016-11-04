@@ -297,11 +297,11 @@ define('app/game', [
         direction: 0,
         rotation: 0,
         radius: 0,
-        image: images.particle,
+        image: images.asteroidsParticle,
         lifetime: 30
       }
       var particle = new Particle(particleSettings);
-      gameObjects.push(particle);    
+      gameObjects.push(particle);
     });
   }
 

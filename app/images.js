@@ -23,6 +23,9 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   var particle = new Image();
   particle.src = "./assets/images/motorparticle.png";
 
+  var asteroidsParticle = new Image();
+  asteroidsParticle.src = "./assets/images/asteroidsparticle.png";
+
   return {
     ship: ship,
     playerbullet: playerbullet,
@@ -31,6 +34,7 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
     asteroydSmall: asteroydSmall,
     victory: victory,
     particle: particle,
+    asteroidsParticle: asteroidsParticle,
     gameover: gameover
   }
 })
