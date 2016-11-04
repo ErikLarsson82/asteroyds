@@ -29,6 +29,7 @@ define('app/game', [
   let gameOver = false;
   let fadeInText = 0;
   let isVictoryMusicPlaying = false
+  let isGasljudetPlaying = false
 
   let playSound
 
@@ -172,10 +173,19 @@ define('app/game', [
         y: 0
       }
       if (pad.buttons[0].pressed) { // up or X
+        if (isGasljudetPlaying === false) {
+          playSound('gasljudet')
+          isGasljudetPlaying = true
+        }
         this.createParticles();
         acceleration = {
           x: Math.sin(this.direction) / 100,
           y: -Math.cos(this.direction) / 100
+        }
+      } else {
+        if (isGasljudetPlaying === true) {
+          playSound('gasljudet', true)
+          isGasljudetPlaying = false
         }
       }
       this.velocity = {

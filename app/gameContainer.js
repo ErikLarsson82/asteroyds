@@ -24,10 +24,17 @@ requirejs([
       this.currentTime = 0;
       this.play();
   }, false);
+
+  const gasljudet = new Audio('assets/sounds/gasljudet.ogg')
+  gasljudet.addEventListener('ended', function() {
+      this.currentTime = 0;
+      this.play();
+  }, false);
   
   const sfxs = {
     gameMusic: gameMusic,
     victoryMusic: victoryMusic,
+    gasljudet: gasljudet,
     shot: new Audio('assets/sounds/Asteroidsshot001.ogg'),
     die: new Audio('assets/sounds/Asteroidsdie001.ogg'),
     hit: new Audio('assets/sounds/Asteroidhit001.ogg'),
