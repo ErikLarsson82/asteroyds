@@ -32,13 +32,43 @@ define('app/game', [
         x: 0,
         y: 0,
       }
+      this.velocity = config.velocity;
+      this.direction = config.direction;
       this.radius = config.radius;
+      this.image = config.image;
     }
     tick() {
-      //move myself
+      //Wrap logic
+      if (this.pos.x > canvasWidth + this.radius) {
+        this.pos.x = -this.radius;
+      }
+      if (this.pos.x < 0 - this.radius) {
+        this.pos.x = canvasWidth + this.radius;
+      }
+      if (this.pos.y > canvasHeight + this.radius) {
+        this.pos.y = -this.radius;
+      }
+      if (this.pos.y < 0 - this.radius) {
+        this.pos.y = canvasHeight + this.radius;
+      }
     }
     draw(renderingContext) {
+      this.drawImage(renderingContext);
 
+      if (DEBUG_DRAW_CIRCLES) {
+        renderingContext.beginPath();
+        renderingContext.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI, false);
+        renderingContext.lineWidth = 2;
+        renderingContext.strokeStyle = "white";
+        renderingContext.stroke();
+      }
+    }
+    drawImage(renderingContext) {
+      renderingContext.save();
+      renderingContext.translate(this.pos.x, this.pos.y);
+      renderingContext.rotate(this.direction);
+      renderingContext.drawImage(this.image, 0 - this.image.width/2, 0 - this.image.height/2);
+      renderingContext.restore();
     }
     remove() {
       this.markedForRemoval = true;
@@ -48,70 +78,100 @@ define('app/game', [
   class PlayerShip extends GameObject {
     constructor(config) {
       super(config)
-      this.speed = config.speed;
-      this.velocity = {
-        x: 0,
-        y: 0
-      }
       this.recharged = true
       this.rechargeTimer = 0;
     }
-    tick() {
+    handleRecharge() {
       this.rechargeTimer--;
       if (this.rechargeTimer <= 0) {
         this.recharged = true;
       }
     }
-    fire() {
-      this.recharged = false;
-      this.rechargeTimer = 30;
-    }
-    draw(renderingContext) {
-      if (DEBUG_DRAW_CIRCLES) {
-        renderingContext.beginPath();
-        renderingContext.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI, false);
-        renderingContext.lineWidth = 2;
-        renderingContext.strokeStyle = "white";
-        renderingContext.stroke();
+    tick() {
+      this.handleRecharge();
+
+      const pad = userInput.getInput(0)
+      if (pad.buttons[14].pressed) { // left
+        this.direction -= 0.03;
       }
+      if (pad.buttons[15].pressed) { // right
+        this.direction += 0.03;
+      }
+      if (pad.buttons[0].pressed) { // z or space
+        this.fire();
+      }
+      var acceleration = {
+        x: 0,
+        y: 0
+      }
+      if (pad.buttons[12].pressed) {
+        acceleration = {
+          x: Math.sin(this.direction) / 100,
+          y: -Math.cos(this.direction) / 100
+        }
+      }
+      this.velocity = {
+        x: this.velocity.x + acceleration.x,
+        y: this.velocity.y + acceleration.y
+      }
+      const nextPosition = {
+        x: this.pos.x + this.velocity.x,
+        y: this.pos.y + this.velocity.y
+      }
+      this.pos = nextPosition;
+
+      super.tick();
+    }
+    fire() {
+      if (!this.recharged) return;
+
+      this.recharged = false;
+      this.rechargeTimer = 40;
+      
+      var shotConfig = {
+        pos: {
+          x: this.pos.x + Math.sin(this.direction) * 26,
+          y: this.pos.y + -Math.cos(this.direction) * 26
+        },
+        velocity: {
+          x: Math.sin(this.direction) * 3,
+          y: -Math.cos(this.direction) * 3
+        },
+        direction: this.direction,
+        image: images.playerbullet
+      }
+      var shot = new Shot(shotConfig);
+      gameObjects.push(shot);
     }
   }
 
-  /*class PlayerBullet extends GameObject {
-    constructor(config) {
-      super(config)
-      this.speed = config.speed
-    }
+  class Shot extends GameObject {
     tick() {
-      this.velocity.y = -this.speed
-    }
-    draw(renderingContext) {
-      if (!DEBUG_DISABLE_GRAPHICS) {
-        renderingContext.drawImage(images.player_shot, this.hitbox.x, this.hitbox.y);
-      } else {
-        super.draw(renderingContext);
+      const nextPosition = {
+        x: this.pos.x + this.velocity.x,
+        y: this.pos.y + this.velocity.y
       }
+      this.pos = nextPosition;
+
+      super.tick();
     }
-  }*/
+  }
+
+  class AsteroydBig extends GameObject {
+    tick() {
+      const nextPosition = {
+        x: this.pos.x + this.velocity.x,
+        y: this.pos.y + this.velocity.y
+      }
+      this.pos = nextPosition;
+
+      super.tick();
+    }
+  }
 
   function isOfTypes(gameObject, other, type1, type2) {
     return (gameObject instanceof type1 && other instanceof type2) ||
         (gameObject instanceof type2 && other instanceof type1)
-  }
-
-  function resolveCollision(gameObject, other) {
-    /*if (isOfTypes(gameObject, other, Enemy, PlayerBullet)) {
-      gameObject.remove();
-      other.remove();
-
-      playSound('enemyHit')
-      gameObjects.push(new EnemyExplosion({
-        hitbox: {
-          x: other.hitbox.x,
-          y: other.hitbox.y
-        },
-      }))
-    }*/
   }
 
   function endConditions() {
@@ -136,23 +196,33 @@ define('app/game', [
           x: canvasWidth / 2,
           y: canvasHeight / 2
         },
-        speed: 0,
-        radius: 10
+        velocity: {
+          x: 0,
+          y: 0
+        },
+        direction: 0,
+        radius: 16,
+        image: images.ship
       })
       gameObjects.push(playerShip)
 
-      /*_.each(new Array(7), function(item1, x) {
-        _.each(new Array(3), function(item2, y) {
-          gameObjects.push(new Enemy({
-            hitbox: {
-              x: 50 + (x * 45),
-              y: 20 + (y * 45),
-              width: 27,
-              height: 21,
-            }
-          }))
-        });
-      })*/
+      _.each(new Array(6), function() {
+
+        gameObjects.push(new AsteroydBig({
+          pos: {
+            x: Math.random() * canvasWidth,
+            y: Math.random() * canvasHeight
+          },
+          velocity: {
+            x: Math.random() - 0.5,
+            y: Math.random() - 0.5
+          },
+          direction: Math.floor(Math.random() * 360),
+          radius: (Math.random() * 25) + 25,
+          image: images.asteroydBig
+        }))
+
+      })
     },
     tick: function() {
 
@@ -162,63 +232,10 @@ define('app/game', [
         return;
       }
 
-      /*if (pad.buttons[14].pressed) { // left
-        //playerShip.velocity.x = -playerShip.speed
-      }
-      if (pad.buttons[15].pressed) { // right
-        //playerShip.velocity.x = playerShip.speed
-      }
-      if (pad.buttons[0].pressed && playerShip.recharged) { // shoot
-        playSound('shot')
-        playerShip.fire();
-        gameObjects.push(new PlayerBullet({
-          hitbox: {
-            x: playerShip.hitbox.x + playerShip.hitbox.width / 2,
-            y: playerShip.hitbox.y - bulletHeight,
-            width: 3,
-            height: bulletHeight,
-          },
-          speed: 7,
-        }))
-      }*/
-
       _.each(gameObjects, function (gameObject) {
-        gameObject.tick()
+        gameObject.tick();
       })
 
-      // resolve movement changes and collisions
-      _.each(gameObjects, function (gameObject) {
-        /*const nextPosition = {
-          x: gameObject.hitbox.x + gameObject.velocity.x,
-          y: gameObject.hitbox.y + gameObject.velocity.y,
-        }
-        for (let i = 0; i < gameObjects.length; i++) {
-          const other = gameObjects[i]
-          if (!other.markedForRemoval && !gameObject.markedForRemoval &&
-            detectCollision(
-              gameObject.hitbox,
-              nextPosition,
-              other.hitbox)) {
-            resolveCollision(gameObject, other)
-          }*/
-        //}
-
-        // set new position
-        // if (
-        //     nextPosition.x >= 0 &&
-        //     nextPosition.x + gameObject.hitbox.width <= canvasWidth)
-        // {
-          //gameObject.hitbox.x = nextPosition.x
-          //gameObject.hitbox.y = nextPosition.y
-        // }
-
-        // reset velocity
-        //gameObject.velocity.x = 0
-        //gameObject.velocity.y = 0
-
-      })
-
-      // remove all removed gameObjects
       gameObjects = gameObjects.filter(function (gameObject) {
         return !gameObject.markedForRemoval
       })

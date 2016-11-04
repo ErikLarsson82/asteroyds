@@ -54,13 +54,13 @@ requirejs([
   function gameLoop() {
     window.requestAnimationFrame(gameLoop)
     if (running) {
-      try {
+      //try {
         game.tick()
         game.draw(renderingContext)
-      } catch (e) {
+      /*} catch (e) {
         console.error(e)
         running = false
-      }
+      }*/
     }
   }
 

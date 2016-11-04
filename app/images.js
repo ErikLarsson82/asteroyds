@@ -1,10 +1,16 @@
 define('app/images', ['SpriteSheet'], function(SpriteSheet) {
-  //var invader = new Image();
-  //invader.src = "./graphics/enemy1_spritesheet.png";
+  var ship = new Image();
+  ship.src = "./assets/images/ship.png";
 
-  
+  var playerbullet = new Image();
+  playerbullet.src = "./assets/images/playerbullet.png";
+
+  var asteroydBig = new Image();
+  asteroydBig.src = "./assets/images/asteroydBig.png";
 
   return {
-    //invader: invader
+    ship: ship,
+    playerbullet: playerbullet,
+    asteroydBig: asteroydBig
   }
 })
