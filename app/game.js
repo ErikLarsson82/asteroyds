@@ -351,7 +351,7 @@ define('app/game', [
       var shot = getOfType(gameObject, other, Shot)
       var asteroydMedium = getOfType(gameObject, other, AsteroydMedium)
 
-      _.each(new Array(3), function() {
+      _.each(new Array(2), function() {
         var asteroydSettings = {
           pos: {
             x: asteroydMedium.pos.x,
