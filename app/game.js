@@ -315,6 +315,13 @@ define('app/game', [
     })
   }
 
+  function playerAlive() {
+    var playerDead = _.filter(gameObjects, function(item) {
+        return item instanceof PlayerShip;
+      }).length;
+    return (playerDead !== 0);
+  }
+
   function endConditions() {
     var amountStroyds = _.filter(gameObjects, function(item) {
         return item instanceof AsteroydBig ||
@@ -323,10 +330,7 @@ define('app/game', [
       }).length;
     if (amountStroyds === 0) gameOver = true;
 
-    var playerDead = _.filter(gameObjects, function(item) {
-        return item instanceof PlayerShip;
-      }).length;
-    if (playerDead === 0) gameOver = true;
+    if (!playerAlive()) gameOver = true;
   }
 
   return {
@@ -405,9 +409,17 @@ define('app/game', [
 
       
       if (gameOver) {
-        renderingContext.font= "30px Verdana";
-        renderingContext.fillStyle="white";
-        renderingContext.fillText("GAME OVER",145,100);
+        if (playerAlive()) {
+          renderingContext.drawImage(images.victory,
+            canvasWidth/2 - images.victory.width/2,
+            canvasHeight/2 - images.victory.height/2
+          );
+        } else {
+          renderingContext.drawImage(images.asteroydBig,
+            canvasWidth/2 - images.asteroydBig.width/2,
+            canvasHeight/2 - images.asteroydBig.height/2
+          );
+        }
       }
     },
   }
