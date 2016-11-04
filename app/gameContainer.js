@@ -11,7 +11,7 @@ requirejs([
 ], function (game) {
 
   let running = true
-  let muted = false
+  let muted = true
 
   const musicAudio = new Audio('assets/sounds/Asteroids001.ogg')
   musicAudio.addEventListener('ended', function() {
