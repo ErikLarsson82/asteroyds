@@ -48,19 +48,30 @@ define('app/game', [
   class PlayerShip extends GameObject {
     constructor(config) {
       super(config)
-      this.speed = config.speed;
       this.velocity = {
-        x: 0,
+        x: 0.1,
         y: 0
       }
+      this.direction = config.direction;
       this.recharged = true
       this.rechargeTimer = 0;
     }
     tick() {
+
+      const pad = userInput.getInput(0)
+      if (pad.buttons[14].pressed) { // left
+        this.direction += 360 / 100;
+      }
+      console.log(this.direction);
       this.rechargeTimer--;
       if (this.rechargeTimer <= 0) {
         this.recharged = true;
       }
+      const nextPosition = {
+        x: this.pos.x + this.velocity.x,
+        y: this.pos.y + this.velocity.y,
+      }
+      this.pos = nextPosition;
     }
     fire() {
       this.recharged = false;
@@ -77,41 +88,9 @@ define('app/game', [
     }
   }
 
-  /*class PlayerBullet extends GameObject {
-    constructor(config) {
-      super(config)
-      this.speed = config.speed
-    }
-    tick() {
-      this.velocity.y = -this.speed
-    }
-    draw(renderingContext) {
-      if (!DEBUG_DISABLE_GRAPHICS) {
-        renderingContext.drawImage(images.player_shot, this.hitbox.x, this.hitbox.y);
-      } else {
-        super.draw(renderingContext);
-      }
-    }
-  }*/
-
   function isOfTypes(gameObject, other, type1, type2) {
     return (gameObject instanceof type1 && other instanceof type2) ||
         (gameObject instanceof type2 && other instanceof type1)
-  }
-
-  function resolveCollision(gameObject, other) {
-    /*if (isOfTypes(gameObject, other, Enemy, PlayerBullet)) {
-      gameObject.remove();
-      other.remove();
-
-      playSound('enemyHit')
-      gameObjects.push(new EnemyExplosion({
-        hitbox: {
-          x: other.hitbox.x,
-          y: other.hitbox.y
-        },
-      }))
-    }*/
   }
 
   function endConditions() {
@@ -136,23 +115,11 @@ define('app/game', [
           x: canvasWidth / 2,
           y: canvasHeight / 2
         },
-        speed: 0,
+        direction: 0,
         radius: 10
       })
       gameObjects.push(playerShip)
 
-      /*_.each(new Array(7), function(item1, x) {
-        _.each(new Array(3), function(item2, y) {
-          gameObjects.push(new Enemy({
-            hitbox: {
-              x: 50 + (x * 45),
-              y: 20 + (y * 45),
-              width: 27,
-              height: 21,
-            }
-          }))
-        });
-      })*/
     },
     tick: function() {
 
@@ -162,63 +129,10 @@ define('app/game', [
         return;
       }
 
-      /*if (pad.buttons[14].pressed) { // left
-        //playerShip.velocity.x = -playerShip.speed
-      }
-      if (pad.buttons[15].pressed) { // right
-        //playerShip.velocity.x = playerShip.speed
-      }
-      if (pad.buttons[0].pressed && playerShip.recharged) { // shoot
-        playSound('shot')
-        playerShip.fire();
-        gameObjects.push(new PlayerBullet({
-          hitbox: {
-            x: playerShip.hitbox.x + playerShip.hitbox.width / 2,
-            y: playerShip.hitbox.y - bulletHeight,
-            width: 3,
-            height: bulletHeight,
-          },
-          speed: 7,
-        }))
-      }*/
-
       _.each(gameObjects, function (gameObject) {
-        gameObject.tick()
+        gameObject.tick();
       })
 
-      // resolve movement changes and collisions
-      _.each(gameObjects, function (gameObject) {
-        /*const nextPosition = {
-          x: gameObject.hitbox.x + gameObject.velocity.x,
-          y: gameObject.hitbox.y + gameObject.velocity.y,
-        }
-        for (let i = 0; i < gameObjects.length; i++) {
-          const other = gameObjects[i]
-          if (!other.markedForRemoval && !gameObject.markedForRemoval &&
-            detectCollision(
-              gameObject.hitbox,
-              nextPosition,
-              other.hitbox)) {
-            resolveCollision(gameObject, other)
-          }*/
-        //}
-
-        // set new position
-        // if (
-        //     nextPosition.x >= 0 &&
-        //     nextPosition.x + gameObject.hitbox.width <= canvasWidth)
-        // {
-          //gameObject.hitbox.x = nextPosition.x
-          //gameObject.hitbox.y = nextPosition.y
-        // }
-
-        // reset velocity
-        //gameObject.velocity.x = 0
-        //gameObject.velocity.y = 0
-
-      })
-
-      // remove all removed gameObjects
       gameObjects = gameObjects.filter(function (gameObject) {
         return !gameObject.markedForRemoval
       })
