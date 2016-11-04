@@ -2,13 +2,22 @@
 <head>
 <script data-main="app/gameContainer" src="lib/require.js"></script>
 <link rel="icon" href="graphics/favicon.png" type="image/png" sizes="16x16">
+<link href="http://fonts.googleapis.com/css?family=Chelsea+Market" rel="stylesheet" type="text/css">
 <style>
 body, div {
-    margin: 0px;
+    margin: 20px;
+    padding: 20px;
     background-color: #070824;
     font-family: Arial;
-    font-size: 0.8em;
-    color: #6A6974;
+    font-family: 'Chelsea Market', cursive;
+}
+.container {
+    position: absolute;
+    top:30px;
+    left: 0;
+    right: 0;
+    margin:auto;
+    width: 1024px;
 }
 canvas {
     padding-left: 0;
@@ -17,20 +26,32 @@ canvas {
     margin-right: auto;
     display: block;
 }
+.text {
+    margin: 20px;
+}
+h1 {
+    color: #a9a9a9;
+}
+h2 {
+    color: #757575;
+}
+p {
+    color: #6A6974;
+}
 </style>
 </head>
 <body>
-<canvas id="canvas" width="1024" height="768"></canvas>
-Keyboard:<br/>
-Left/Right - Steer<br/>
-Shoot - Z<br/>
-<br/><br/>
-Controller:<br/>
-D-pad - Steer<br/>
-Shoot - X<br/><br/>
-Created by:<br/>
-Erik Larsson - Design, Graphics, Programming<br/>
-Fredrik Järnbröst - Design, Music, Sound, Programming<br/>
+<div class="container">
+    <canvas id="canvas" width="1024" height="768"></canvas>
+    <div class="text">
+        <h1>Instructions:</h1>
+        <h2>Keyboard:</h2>
+        <p>Left/Right - Steer</p>
+        <p>Shoot - Z</p>
+        <h2>Created by:</h2>
+        <p>Fredrik Järnbröst - Design, Music, Sound, Programming</p>
+        <p>Erik Larsson - Design, Graphics, Programming</p>
+    </div>
 </div>
 </body>
 </html>
