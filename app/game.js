@@ -32,13 +32,32 @@ define('app/game', [
         x: 0,
         y: 0,
       }
+      this.velocity = config.velocity;
       this.radius = config.radius;
     }
     tick() {
-      //move myself
+      //Wrap logic
+      if (this.pos.x > canvasWidth + this.radius) {
+        this.pos.x = -this.radius;
+      }
+      if (this.pos.x < 0 - this.radius) {
+        this.pos.x = canvasWidth + this.radius;
+      }
+      if (this.pos.y > canvasHeight + this.radius) {
+        this.pos.y = -this.radius;
+      }
+      if (this.pos.y < 0 - this.radius) {
+        this.pos.y = canvasHeight + this.radius;
+      }
     }
     draw(renderingContext) {
-
+      if (DEBUG_DRAW_CIRCLES) {
+        renderingContext.beginPath();
+        renderingContext.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI, false);
+        renderingContext.lineWidth = 2;
+        renderingContext.strokeStyle = "white";
+        renderingContext.stroke();
+      }
     }
     remove() {
       this.markedForRemoval = true;
@@ -49,7 +68,7 @@ define('app/game', [
     constructor(config) {
       super(config)
       this.velocity = {
-        x: 0.1,
+        x: 0,
         y: 0
       }
       this.direction = config.direction;
@@ -57,34 +76,62 @@ define('app/game', [
       this.rechargeTimer = 0;
     }
     tick() {
-
       const pad = userInput.getInput(0)
       if (pad.buttons[14].pressed) { // left
-        this.direction += 360 / 100;
+        this.direction -= 0.03;
       }
-      console.log(this.direction);
+      if (pad.buttons[15].pressed) { // right
+        this.direction += 0.03;
+      }
       this.rechargeTimer--;
       if (this.rechargeTimer <= 0) {
         this.recharged = true;
       }
+      var acceleration = {
+        x: 0,
+        y: 0
+      }
+      if (pad.buttons[12].pressed) {
+        acceleration = {
+          x: Math.sin(this.direction) / 100,
+          y: -Math.cos(this.direction) / 100
+        }
+      }
+      this.velocity = {
+        x: this.velocity.x + acceleration.x,
+        y: this.velocity.y + acceleration.y
+      }
       const nextPosition = {
         x: this.pos.x + this.velocity.x,
-        y: this.pos.y + this.velocity.y,
+        y: this.pos.y + this.velocity.y
       }
       this.pos = nextPosition;
+
+      super.tick();
     }
     fire() {
       this.recharged = false;
       this.rechargeTimer = 30;
     }
     draw(renderingContext) {
-      if (DEBUG_DRAW_CIRCLES) {
-        renderingContext.beginPath();
-        renderingContext.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI, false);
-        renderingContext.lineWidth = 2;
-        renderingContext.strokeStyle = "white";
-        renderingContext.stroke();
+      renderingContext.save();
+      renderingContext.translate(this.pos.x, this.pos.y);
+      renderingContext.rotate(this.direction);
+      renderingContext.drawImage(images.ship, 0 - images.ship.width/2, 0 - images.ship.height/2);
+      renderingContext.restore();
+      super.draw(renderingContext);
+    }
+  }
+
+  class AsteroydBig extends GameObject {
+    tick() {
+      const nextPosition = {
+        x: this.pos.x + this.velocity.x,
+        y: this.pos.y + this.velocity.y
       }
+      this.pos = nextPosition;
+
+      super.tick();
     }
   }
 
@@ -116,10 +163,26 @@ define('app/game', [
           y: canvasHeight / 2
         },
         direction: 0,
-        radius: 10
+        radius: 16
       })
       gameObjects.push(playerShip)
 
+      _.each(new Array(6), function() {
+
+        gameObjects.push(new AsteroydBig({
+          pos: {
+            x: Math.random() * canvasWidth,
+            y: Math.random() * canvasHeight
+          },
+          velocity: {
+            x: Math.random() - 0.5,
+            y: Math.random() - 0.5
+          },
+          direction: Math.floor(Math.random() * 360),
+          radius: (Math.random() * 25) + 25
+        }))
+
+      })
     },
     tick: function() {
 

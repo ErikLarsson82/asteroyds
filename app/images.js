@@ -1,10 +1,8 @@
 define('app/images', ['SpriteSheet'], function(SpriteSheet) {
-  //var invader = new Image();
-  //invader.src = "./graphics/enemy1_spritesheet.png";
-
-  
+  var ship = new Image();
+  ship.src = "./assets/images/ship.png";
 
   return {
-    //invader: invader
+    ship: ship
   }
 })
