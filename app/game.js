@@ -121,6 +121,27 @@ define('app/game', [
     }
   }
 
+  class Star extends GameObject {
+    constructor(config) {
+      super(config);
+    }
+    tick() {
+      this.velocity = {
+        x: -Math.sin(playerShip.direction) * 3,
+        y: Math.cos(playerShip.direction) * 3
+      }
+      const nextPosition = {
+        x: this.pos.x + this.velocity.x,
+        y: this.pos.y + this.velocity.y
+      }
+      this.pos = nextPosition;
+      super.tick();
+    }
+    draw(renderingContext) {
+      super.draw(renderingContext);
+    }
+  }
+
   class DeathParticle extends GameObject {
     constructor(config) {
       super(config);
@@ -392,6 +413,29 @@ define('app/game', [
     })
   }
 
+  function stars() {
+    
+    _.each(new Array(30), function(dir) {
+
+    var particleSettings = {
+        pos: {
+          x: Math.random() * canvasWidth,
+          y: Math.random() * canvasHeight
+        },
+        velocity: {
+          x: 0,
+          y: 0
+        },
+        direction: 0,
+        rotation: 0,
+        radius: 0,
+        image: images.star
+      }
+      var particle = new Star(particleSettings);
+      gameObjects.push(particle);
+    })
+  }
+
   function resolveCollision(gameObject, other) {
     if (isOfTypes(gameObject, other, PlayerShip, AsteroydBig)) {
       var player = getOfType(gameObject, other, PlayerShip)
@@ -500,9 +544,70 @@ define('app/game', [
                item instanceof AsteroydMedium ||
                item instanceof AsteroydSmall;
       }).length;
-    if (amountStroyds === 0) gameOver = true;
+    if (amountStroyds === 0) {
+      stars();
+      gameOver = true;
+    }
 
     if (!playerAlive()) gameOver = true;
+  }
+
+  function drawGameOver(renderingContext) {
+    renderingContext.fillStyle = "#01020B"
+    renderingContext.fillRect(0,0,canvasWidth, canvasHeight)
+
+    _.each(gameObjects, function (gameObject) {
+      if (gameObject instanceof Star)
+        gameObject.draw(renderingContext)
+    })
+    _.each(gameObjects, function (gameObject) {
+      if (gameObject instanceof PlayerShip ||
+          gameObject instanceof Particle)
+        gameObject.draw(renderingContext)
+    })
+    if (fadeInText < 1) fadeInText += 0.01;
+    renderingContext.globalAlpha = fadeInText;
+    if (playerAlive()) {
+      if (isVictoryMusicPlaying === false) {
+        playSound('gameMusic', true)
+        playSound('victoryMusic')
+        isVictoryMusicPlaying = true
+      }
+      renderingContext.drawImage(images.victory,
+        Math.round(canvasWidth/2 - images.victory.width/2),
+        Math.round(canvasHeight/2 - images.victory.height/2)
+      );
+
+    } else {
+      renderingContext.drawImage(images.gameover,
+        Math.round(canvasWidth/2 - images.gameover.width/2),
+        Math.round(canvasHeight/2 - images.gameover.height/2)
+      );
+
+    }
+    renderingContext.globalAlpha = 1;
+  }
+
+  function tickGameOver() {
+    if (isGasljudetPlaying === true) {
+      playSound('gasljudet', true)
+      isGasljudetPlaying === false
+    }
+
+    playerShip.pos = {
+      x: 500,
+      y: 200
+    }
+    playerShip.createParticles();
+
+    //Only tick some stuff!
+    _.each(gameObjects, function (gameObject) {
+      if (gameObject instanceof DeathParticle ||
+        gameObject instanceof Particle ||
+        gameObject instanceof PlayerShip ||
+        gameObject instanceof Star) gameObject.tick();
+    })
+
   }
 
   return {
@@ -571,19 +676,10 @@ define('app/game', [
     },
     tick: function() {
 
-      endConditions();
-
       if (gameOver) {
-        if (isGasljudetPlaying === true) {
-          playSound('gasljudet', true)
-          isGasljudetPlaying === false
-        }
-        //Only tick some stuff!
-        _.each(gameObjects, function (gameObject) {
-          if (gameObject instanceof DeathParticle ||
-            gameObject instanceof Particle) gameObject.tick();
-        })
+        tickGameOver();
       } else {
+        endConditions();
         _.each(gameObjects, function (gameObject) {
           gameObject.tick();
         })
@@ -594,39 +690,21 @@ define('app/game', [
       })
     },
     draw: function (renderingContext) {
-      renderingContext.drawImage(images.starry, 0,0)
-
+      
       if (DEBUG_DRAW_SAFE_ZONE) {
         renderingContext.fillStyle = "red"
         renderingContext.fillRect(safeZone.x, safeZone.y, safeZone.width, safeZone.height)
       }
 
-      _.each(gameObjects, function (gameObject) {
-        gameObject.draw(renderingContext)
-      })
-
-      
       if (gameOver) {
-        if (fadeInText < 1) fadeInText += 0.01;
-        renderingContext.globalAlpha = fadeInText;
-        if (playerAlive()) {
-          if (isVictoryMusicPlaying === false) {
-            playSound('gameMusic', true)
-            playSound('victoryMusic')
-            isVictoryMusicPlaying = true
-          }
-          renderingContext.drawImage(images.victory,
-            Math.round(canvasWidth/2 - images.victory.width/2),
-            Math.round(canvasHeight/2 - images.victory.height/2)
-          );
-        } else {
-          renderingContext.drawImage(images.gameover,
-            Math.round(canvasWidth/2 - images.gameover.width/2),
-            Math.round(canvasHeight/2 - images.gameover.height/2)
-          );
+        drawGameOver(renderingContext);
+      } else {
+          renderingContext.drawImage(images.starry, 0,0)
+          
+          _.each(gameObjects, function (gameObject) {
+            gameObject.draw(renderingContext)
+          })
         }
-        renderingContext.globalAlpha = 1;
-      }
     },
     destroy: function() {
       playSound('victoryMusic', true)

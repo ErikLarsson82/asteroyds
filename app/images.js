@@ -23,6 +23,9 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   var particle = new Image();
   particle.src = "./assets/images/motorparticle.png";
 
+  var star = new Image();
+  star.src = "./assets/images/star.png";
+
   var asteroidsParticle = new Image();
   asteroidsParticle.src = "./assets/images/asteroidsparticle.png";
 
@@ -43,6 +46,7 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
     asteroidsParticle: asteroidsParticle,
     gameover: gameover,
     deathparticle: deathparticle,
-    starry: starry
+    starry: starry,
+    star: star
   }
 })
