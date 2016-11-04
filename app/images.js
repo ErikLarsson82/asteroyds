@@ -29,6 +29,9 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
   var deathparticle = new Image();
   deathparticle.src = "./assets/images/deathparticle.png";
 
+  var starry = new Image();
+  starry.src = "./assets/images/starryeyes.png";
+
   return {
     ship: ship,
     playerbullet: playerbullet,
@@ -39,6 +42,7 @@ define('app/images', ['SpriteSheet'], function(SpriteSheet) {
     particle: particle,
     asteroidsParticle: asteroidsParticle,
     gameover: gameover,
-    deathparticle: deathparticle
+    deathparticle: deathparticle,
+    starry: starry
   }
 })

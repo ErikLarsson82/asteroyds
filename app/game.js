@@ -594,8 +594,7 @@ define('app/game', [
       })
     },
     draw: function (renderingContext) {
-      renderingContext.fillStyle = "#01020B"
-      renderingContext.fillRect(0,0,canvasWidth, canvasHeight)
+      renderingContext.drawImage(images.starry, 0,0)
 
       if (DEBUG_DRAW_SAFE_ZONE) {
         renderingContext.fillStyle = "red"
