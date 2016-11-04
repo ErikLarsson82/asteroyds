@@ -13,6 +13,7 @@ requirejs([
 
   let running = true
   let muted = false
+  let restartButtonReleased = true;
 
   const gameMusic = new Audio('assets/sounds/Asteroids001.ogg')
   gameMusic.addEventListener('ended', function() {
@@ -77,7 +78,11 @@ requirejs([
   setInterval(function() {
     if (!running) return;
     const pad = userInput.getInput(0);
-    if (pad.buttons[9].pressed) {
+    if (!pad.buttons[9].pressed) {
+      restartButtonReleased = true;
+    }
+    if (pad.buttons[9].pressed && restartButtonReleased) {
+      restartButtonReleased = false;
       game.destroy();
       game.init(playSound);
     }
